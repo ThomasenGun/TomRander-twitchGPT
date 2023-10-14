@@ -41,7 +41,7 @@ if (!COMMAND_NAME) {
     COMMAND_NAME = "gpt"
 }
 if (!CHANNELS) {
-    CHANNELS = ["oSetinhas"]
+    CHANNELS = ["oSetinhas","jones88"]
 } else {
     // split channels by comma into array
     CHANNELS = CHANNELS.split(",")
@@ -55,6 +55,8 @@ let last_user_message = ""
 // setup twitch bot
 const channels = CHANNELS;
 const channel = channels[0];
+console.log("Channels: " + channel)
+
 const bot = new TwitchBot(TWITCH_USER, TWITCH_AUTH, channels);
 
 // setup openai operations
@@ -67,7 +69,8 @@ bot.onConnected((addr, port) => {
 
     // join channels
     channels.forEach(channel => {
-        bot.say(channel, `Hello, I am a helpful Twitch Chatbot. You can ask me anything by typing !${COMMAND_NAME} <your question> in the chat. I will try my best to answer!`);
+        console.log(`* Joining ${channel}`);
+        //bot.say(channel, `Hello, I am a helpful Twitch Chatbot. You can ask me anything by typing !${COMMAND_NAME} <your question> in the chat. I will try my best to answer!`);
     });
 });
 
