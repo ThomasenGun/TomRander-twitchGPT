@@ -2,7 +2,13 @@ import express from 'express';
 import fs from 'fs';
 import {OpenAIOperations} from './openai_operations.js';
 import {TwitchBot} from './twitch_bot.js';
+import {job} from './keep_alive.js';
 
+// start keep alive cron job
+job.start();
+console.log(process.env)
+
+// setup express app
 const app = express()
 
 // load env variables
@@ -16,7 +22,7 @@ let COMMAND_NAME = process.env.COMMAND_NAME
 let CHANNELS = process.env.CHANNELS
 
 if (!GPT_MODE) {
-    GPT_MODE = "PROMPT"
+    GPT_MODE = "CHAT"
 }
 if (!HISTORY_LENGTH) {
     HISTORY_LENGTH = 5
@@ -29,19 +35,19 @@ if (!MODEL_NAME) {
 }
 if (!TWITCH_USER) {
     TWITCH_USER = "oSetinhasBot"
-    console.log("No TWITCH_USER found. Please set it as environment variable.")
+    console.log("No TWITCH_USER found. Using oSetinhasBot as default.")
 }
 if (!TWITCH_AUTH) {
     // https://dev.twitch.tv/console
     // https://twitchapps.com/tmi/
     TWITCH_AUTH = "oauth:vgvx55j6qzz1lkt3cwggxki1lv53c2"
-    console.log("No TWITCH_AUTH found. Please set it as environment variable.")
+    console.log("No TWITCH_AUTH found. Using oSetinhasBot auth as default.")
 }
 if (!COMMAND_NAME) {
-    COMMAND_NAME = "gpt"
+    COMMAND_NAME = "chat"
 }
 if (!CHANNELS) {
-    CHANNELS = ["oSetinhas","jones88"]
+    CHANNELS = ["oSetinhas", "jones88"]
 } else {
     // split channels by comma into array
     CHANNELS = CHANNELS.split(",")
@@ -55,7 +61,7 @@ let last_user_message = ""
 // setup twitch bot
 const channels = CHANNELS;
 const channel = channels[0];
-console.log("Channels: " + channel)
+console.log("Channels: " + channels)
 
 const bot = new TwitchBot(TWITCH_USER, TWITCH_AUTH, channels);
 
@@ -70,8 +76,8 @@ bot.onConnected((addr, port) => {
     // join channels
     channels.forEach(channel => {
         console.log(`* Joining ${channel}`);
-        //bot.say(channel, `Hello, I am a helpful Twitch Chatbot. You can ask me anything by typing !${COMMAND_NAME} <your question> in the chat. I will try my best to answer!`);
-    });
+        console.log(`* Saying hello in ${channel}`)
+        });
 });
 
 bot.onDisconnected((reason) => {
@@ -89,31 +95,31 @@ bot.connect(
     }
 );
 
-// bot.onMessage(async (channel, user, message, self) => {
-//     if (self) return;
-//
-//     // check if message is a command started with !COMMAND_NAME (e.g. !gpt)
-//     if (message.startsWith("!" + COMMAND_NAME)) {
-//         // get text
-//         const text = message.slice(COMMAND_NAME.length + 1);
-//
-//         // make openai call
-//         const response = await openai_ops.make_openai_call(text);
-//
-//         // split response if it exceeds twitch chat message length limit
-//         // send multiples messages with a delay in between
-//         if (response.length > MAX_LENGTH) {
-//             const messages = response.match(new RegExp(`.{1,${MAX_LENGTH}}`, "g"));
-//             messages.forEach((message, index) => {
-//                 setTimeout(() => {
-//                     bot.say(channel, message);
-//                 }, 1000 * index);
-//             });
-//         } else {
-//             bot.say(channel, response);
-//         }
-//     }
-// });
+bot.onMessage(async (channel, user, message, self) => {
+    if (self) return;
+
+    // check if message is a command started with !COMMAND_NAME (e.g. !gpt)
+    if (message.startsWith("!" + COMMAND_NAME)) {
+        // get text
+        const text = message.slice(COMMAND_NAME.length + 1);
+
+        // make openai call
+        const response = await openai_ops.make_openai_call(text);
+
+        // split response if it exceeds twitch chat message length limit
+        // send multiples messages with a delay in between
+        if (response.length > MAX_LENGTH) {
+            const messages = response.match(new RegExp(`.{1,${MAX_LENGTH}}`, "g"));
+            messages.forEach((message, index) => {
+                setTimeout(() => {
+                    bot.say(channel, message);
+                }, 1000 * index);
+            });
+        } else {
+            bot.say(channel, response);
+        }
+    }
+});
 
 // setup bot
 const messages = [
