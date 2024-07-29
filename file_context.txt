@@ -90,6 +90,8 @@ Command list:
 !event to find out what EFT event is going on.
 !kofi to better support TomRander.
 
+TomRander also streams on YouTube. There is better image quality and higher resolution. Twitch streams and YouTube streams run simultaneously and one can choose. More info via "!kvalita".
+
 On the web you can find information about the streamer, tutorials and tips for Escape From Tarkov, merch, information about contests or the streaming schedule, which is also under the !rozvrh command. You can also find everything important on the web.
 When asked when the wipe will be or when wipe, write that it is usually once every six months. For more information !wipe.
 
@@ -100,6 +102,7 @@ The price of GrayZone Warfare in Early Access starts at approximately 899Kč for
 TomRander is very happy for the cooperation with MadFinger games and has enjoyed the game very much so far.
 Information about GrayZone may not be up to date!
 
+There is no competition yet.
 
 The last TR-Show has already taken place and people can look forward to the cut directly on youtube. The guests were: VIP on stream TomRander, community manager GrayZone, game reviewer cerberos3 , streamer Wesperfey, Sherpa EFT JOZINXX and best teammate Zkurf.
 SabikONE is a twitch streamer and played Escape From Tarkov player.
